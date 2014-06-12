@@ -114,3 +114,5 @@ postscript_page(g1, g2, g3, stepper45degrees)
 
 gp = GearPlate().lowerLeftCorner().offset(0.5, 0.5)
 postscript_page(gp)
+# gp2 = GearPlate().lowerLeftCorner().rotate(45).offset(0.5, 0.5)
+# postscript_page(gp, gp2)

@@ -1,3 +1,8 @@
+from math import pi, sin, cos
+
+# other classes that go up here: LineTo, MoveTo, Path
+
+
 class Arc(object):
 	# http://www.physics.emory.edu/faculty/weeks/graphics/howtops2.html
 	def __init__(self, x, y, r, angle1, angle2):
@@ -99,14 +104,25 @@ class Paths(object):
 					return xy
 		return map(trpt, path)
 
+	def rotate(self, degrees):
+		# clockwise
+		radians = (pi / 180) * degrees
+		def func(x, y, a=cos(radians),b=-sin(radians),c=sin(radians)):
+			# when rotating an Arc, we want to add degrees to angle1 and angle2
+			# yet another argument for better polymorphism
+			return (a * x + b * y, c * x + a * y)
+		return self.forAllPoints(func)
+
 	def forAllPoints(self, func):
 		def tr(path):
 			return self.transformPath(func, path)
 		self.paths = map(tr, self.paths)
+		return self
 
 	def translateAllPoints(self, dx, dy):
 		self.forAllPoints(lambda x, y: (x + dx, y + dy))
 		self.setMinMax()
+		return self
 
 	def setMinMax(self, xy=None):
 		self.minx = self.maxx = self.miny = self.maxy = None
