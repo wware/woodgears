@@ -1,8 +1,47 @@
+class Arc(object):
+	# http://www.physics.emory.edu/faculty/weeks/graphics/howtops2.html
+	def __init__(self, x, y, r, angle1, angle2):
+		self.x, self.y, self.r, self.angle1, self.angle2 = x, y, r, angle1, angle2
+
+	def pscmd(self):
+		return 'arc'
+
+	def postscript(self, xoffset, yoffset):
+		return '{0} {1} {2} {3} {4} {5}'\
+			.format(72 * (self.x + xoffset), 72 * (self.y + yoffset), 72 * self.r,
+				self.angle1, self.angle2, self.pscmd())
+
+
+class Arcn(Arc):
+	def pscmd(self):
+		return 'arcn'
+
+
 class Paths(object):
-	def __init__(self):
+
+	def __init__(self, *args):
+		self._args = args
 		self._offset = (0, 0)   # in inches
 		self.minx = self.maxx = self.miny = self.maxy = None
 		self.paths = []
+
+	def __repr__(self):
+		return '<' + self.__class__.__name__ + ' ' + repr(self.paths) + '>'
+
+	def lowerLeftCorner(self):
+		self.offset(-self.minx, -self.miny)
+		return self
+
+	def addPath(self, path):
+		self.paths.append(path)
+		self.setMinMax()
+
+	def add(self, other):
+		assert isinstance(other, Paths)
+		def func(x, y, dx=other._offset[0], dy=other._offset[1]):
+			return (x + dx, y + dy)
+		for path in other.paths:
+			self.addPath(self.transformPath(func, path))
 
 	def read(self, inf):
 		currentPath = []
@@ -23,7 +62,8 @@ class Paths(object):
 
 	def __add__(self, other):
 		assert isinstance(other, Paths)
-		assert self._offset == other._offset
+		other = other.clone()
+		other.translateAllPoints(other._offset[0], other._offset[1])
 		p = Paths()
 		p.paths = self.paths + other.paths
 		p._offset = self._offset
@@ -34,6 +74,7 @@ class Paths(object):
 		return p
 
 	def radius(self):
+		self.setMinMax()
 		xc, yc = self.centroid()
 		rad = [0]
 		def f(x, y):
@@ -42,24 +83,33 @@ class Paths(object):
 		self.forAllPoints(f)
 		return rad[0]
 
-	def forAllPoints(self, func):
-		def tr(path):
-			def trpt(xy):
+	def transformPath(self, func, path):
+		def trpt(xy):
+			# consider defining a Point class so that Point and Arc
+			# can each define their own translate methods
+			if isinstance(xy, Arc):
+				x, y = func(xy.x, xy.y)
+				return xy.__class__(x, y, xy.r, xy.angle1, xy.angle2)
+			else:
 				x, y = xy
 				xy = func(x, y)
 				if xy is None:
 					return x, y
 				else:
 					return xy
-			return map(trpt, path)
+		return map(trpt, path)
+
+	def forAllPoints(self, func):
+		def tr(path):
+			return self.transformPath(func, path)
 		self.paths = map(tr, self.paths)
 
 	def translateAllPoints(self, dx, dy):
 		self.forAllPoints(lambda x, y: (x + dx, y + dy))
-		self.minx, self.maxx = self.minx + dx, self.maxx + dx
-		self.miny, self.maxy = self.miny + dy, self.maxy + dy
+		self.setMinMax()
 
 	def setMinMax(self, xy=None):
+		self.minx = self.maxx = self.miny = self.maxy = None
 		def setMinMaxOnePoint(x, y):
 			def f(func, m, x):
 				return (m is None) and x or func(m, x)
@@ -67,17 +117,20 @@ class Paths(object):
 			self.maxx = f(max, self.maxx, x)
 			self.miny = f(min, self.miny, y)
 			self.maxy = f(max, self.maxy, y)
+			return (x, y)
 		if xy is None:
 			self.forAllPoints(setMinMaxOnePoint)
 		else:
 			x, y = xy
 			setMinMaxOnePoint(x, y)
+		return xy
 
 	def clone(self):
-		cln = self.__class__()
+		cln = apply(self.__class__, self._args)
 		cln.paths = map(lambda path: path[:], self.paths)
 		cln.pathprep = self.pathprep
 		cln._offset = self._offset
+		cln.setMinMax()
 		return cln
 
 	def __cmp__(self, other):
@@ -89,8 +142,13 @@ class Paths(object):
 	def offset(self, dx, dy):
 		x, y = self._offset
 		self._offset = x + dx, y + dy
+		self.setMinMax()
+		return self
 
-	def postscript(self, outf):
+	def postscript(self, outf=None):
+		if outf is None:
+			import sys
+			outf = sys.stdout
 		# don't forget to add header and footer
 		pathindex = 0
 		xoffset, yoffset = self._offset
@@ -98,9 +156,13 @@ class Paths(object):
 			self.pathprep(outf, pathindex)
 			pathindex += 1
 			verb = 'moveto'
-			for x, y in path:
-				outf.write('{0} {1} {2}\n'.format((x + xoffset) * 72, (y + yoffset) * 72, verb))
-				verb = 'lineto'
+			for thing in path:
+				if isinstance(thing, Arc):
+					outf.write(thing.postscript(xoffset, yoffset) + '\n')
+				else:
+					x, y = thing
+					outf.write('{0} {1} {2}\n'.format((x + xoffset) * 72, (y + yoffset) * 72, verb))
+					verb = 'lineto'
 			outf.write('stroke\n')
 
 	def pathprep(self, outf, index):
@@ -119,6 +181,20 @@ class Paths(object):
 			color = colors[pathindex % len(colors)]
 			outf.write(apply('{0} {1} {2} setrgbcolor\n'.format, color))
 		self.pathprep = pathprep
+		return self
+
+
+class Circle(Paths):
+
+	def __init__(self, diameter):
+		super(Circle, self).__init__(diameter)
+		r = 0.5 * diameter
+		self.minx = self.miny = -r
+		self.maxx = self.maxy = r
+		self._diameter = diameter
+		self.addPath([
+			Arc(0, 0, 0.5 * diameter, 0, 360)
+		])
 
 
 class Hexagon(Paths):
@@ -128,19 +204,19 @@ class Hexagon(Paths):
 		return cls(height / (3**.5))
 
 	def __init__(self, size):
-		super(Hexagon, self).__init__()
-		a = 0.5 * (3**.5)
-		self.paths = [
-			[
-				(-size, 0),
-				(-0.5 * size, a * size),
-				(0.5 * size, a * size),
-				(size, 0),
-				(0.5 * size, -a * size),
-				(-0.5 * size, -a * size),
-				(-size, 0)
-			]
-		]
+		super(Hexagon, self).__init__(size)
+		hsize = 0.5 * size
+		asize = 0.5 * (3**.5) * size
+		self.addPath([
+			(-size, 0),
+			(-hsize, asize),
+			(hsize, asize),
+			(size, 0),
+			(hsize, -asize),
+			(-hsize, -asize),
+			(-size, 0)
+		])
+		self.centerAtOrigin()
 
 
 class WoodGear(Paths):
@@ -151,15 +227,18 @@ class WoodGear(Paths):
 	and subsequent paths will be cut-outs for spokes.
 	"""
 
-	def __init__(self, inf=None):
+	def __init__(self):
 		super(WoodGear, self).__init__()
 		self._boreRemoved = False
+
+	def read(self, inf):
 		if inf is not None:
 			self.active = False
 			if isinstance(inf, str) or isinstance(inf, unicode):
 				inf = open(inf)
-			self.read(inf)
+			super(WoodGear, self).read(inf)
 			self.centerAtOrigin()
+		return self
 
 	def clone(self):
 		cl = super(WoodGear, self).clone()
@@ -195,8 +274,8 @@ class WoodGear(Paths):
 
 
 def postscript_page(*gears):
-	import sys
+	# goes to stdout
 	print '%!PS'
 	for gear in gears:
-		gear.postscript(sys.stdout)
+		gear.postscript()
 	print 'showpage'

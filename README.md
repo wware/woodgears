@@ -21,7 +21,9 @@ should have a shape described by an _involute_ curve described
 this information is available online means that I can eventually put it in the
 Python code and not need to go to the woodgears.ca website. And check out the
 section on [rigid body
-mechanics](http://www.cs.cmu.edu/~rapidproto/mechanisms/chpt4.html).
+mechanics](http://www.cs.cmu.edu/~rapidproto/mechanisms/chpt4.html). Also,
+there is info about stepper motor sizes
+[here](http://www.piclist.com/techref/io/stepper/nemasizes.htm).
 
 Initially I wanted to put together a little Python library that enables gears
 to be copied and repositioned, and the center hole replace by a hexagonal
