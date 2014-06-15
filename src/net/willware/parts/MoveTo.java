@@ -3,7 +3,7 @@ package net.willware.parts;
 import java.util.Formatter;
 import java.util.Locale;
 
-public class MoveTo implements PostscriptElement {
+public class MoveTo extends Element {
 
 	Vector vec;
 	

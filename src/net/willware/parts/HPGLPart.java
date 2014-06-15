@@ -23,7 +23,7 @@ public class HPGLPart extends Part {
 	public Part read(InputStream ins) throws IOException {
 		BufferedReader buffer = new BufferedReader(new InputStreamReader(ins));
 		Path p = new Path();
-		double scale = 1.0 / (25.4 * 40);
+		double scale = 1.0 / HPGL_DPI;
 		boolean active = false;
 		while (true) {
 			String line = buffer.readLine();

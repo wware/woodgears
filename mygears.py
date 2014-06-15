@@ -1,6 +1,7 @@
 import sys
 sys.path.append("target/Parts-0.0.1-SNAPSHOT.jar")
 from net.willware.parts import *
+from stepper import StepperNEMA23
 
 
 class GearPlate(Part):

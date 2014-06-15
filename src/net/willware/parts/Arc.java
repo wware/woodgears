@@ -3,7 +3,7 @@ package net.willware.parts;
 import java.util.Formatter;
 import java.util.Locale;
 
-public class Arc implements PostscriptElement {
+public class Arc extends Element {
 
 	Vector center;
 	double radius, angle1, angle2;

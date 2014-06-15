@@ -11,19 +11,13 @@ import java.util.ArrayList;
 
 public class Part extends Path {
 
-	ArrayList<Path> paths = new ArrayList<Path>();
+	ArrayList<Element> paths = new ArrayList<Element>();
 
-	public Part add(Path p) {
-		paths.add(p);
-		growBbox(p);
-		return this;
-	}
-
-	public Part add(Part p) {
-		for (Path path : p.paths) {
-			add(path);
+	public Element add(Element e) {
+		if (!(e instanceof Path)) {
+			throw new RuntimeException("Elements of a Part must be instances of Path");
 		}
-		return this;
+		return _add(e);
 	}
 
 	public Part bottomLeft() {
@@ -36,8 +30,14 @@ public class Part extends Path {
 		return (Part) translate(new Vector(-c.getX(), -c.getY()));
 	}
 
-	private interface Tweaker {
-		Path tweak(Path e);
+	@Override
+	protected Element makeEmpty() {
+		return new Part();
+	}
+
+	@Override
+	public ArrayList<Element> getSubElements() {
+		return paths;
 	}
 
 	private static String getStackTrace(final Throwable throwable) {
@@ -47,47 +47,38 @@ public class Part extends Path {
 	     return sw.getBuffer().toString();
 	}
 
-	private Part tweak(Tweaker tw) {
-		Part p = new Part();
-		p.bbox = null;
-		for (Path e : paths) {
-			p.add(tw.tweak(e));
-		}
-		return p;
-	}
-
 	@Override
 	public Element clone() {
-		return tweak(new Tweaker() {
-			public Path tweak(Path e) {
-				return (Path) e.clone();
+		return apply(new Tweaker() {
+			public Element tweak(Element e) {
+				return e.clone();
 			}
 		});
 	}
 
 	@Override
 	public Element translate(final Vector v) {
-		return tweak(new Tweaker() {
-			public Path tweak(Path e) {
-				return (Path) e.translate(v);
+		return apply(new Tweaker() {
+			public Element tweak(Element e) {
+				return e.translate(v);
 			}
 		});
 	}
 
 	@Override
 	public Element rotate(final double degrees) {
-		return tweak(new Tweaker() {
-			public Path tweak(Path e) {
-				return (Path) e.rotate(degrees);
+		return apply(new Tweaker() {
+			public Element tweak(Element e) {
+				return e.rotate(degrees);
 			}
 		});
 	}
 
 	@Override
 	public Element scale(final double scalar) {
-		return tweak(new Tweaker() {
-			public Path tweak(Path e) {
-				return (Path) e.scale(scalar);
+		return apply(new Tweaker() {
+			public Element tweak(Element e) {
+				return e.scale(scalar);
 			}
 		});
 	}
@@ -95,7 +86,7 @@ public class Part extends Path {
 	@Override
 	public String toPostscript() {
 		StringBuilder sb = new StringBuilder();
-		for (Path e : paths) {
+		for (Element e : paths) {
 			sb.append(e.toPostscript());
 		}
 		return sb.toString();

@@ -3,7 +3,7 @@ package net.willware.parts;
 import java.util.Formatter;
 import java.util.Locale;
 
-public class Vector implements Element {
+public class Vector extends Element {
 	double x, y;
 	public Vector(double x, double y) {
 		this.x = x;

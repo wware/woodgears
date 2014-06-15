@@ -14,7 +14,7 @@ public class ColoredPath extends Path {
 	}
 
 	@Override
-	protected Path makeEmpty() {
+	protected Element makeEmpty() {
 		ColoredPath p = new ColoredPath();
 		p.red = red;
 		p.green = green;

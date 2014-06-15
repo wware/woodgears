@@ -3,7 +3,7 @@ package net.willware.parts;
 import java.util.Formatter;
 import java.util.Locale;
 
-public class LineTo implements PostscriptElement {
+public class LineTo extends Element {
 
 	Vector vec;
 	
