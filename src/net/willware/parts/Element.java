@@ -12,6 +12,9 @@ public abstract class Element {
 
     public abstract Element clone();
     public abstract Element translate(Vector v);
+    public Element translate(double x, double y) {
+        return translate(new Vector(x, y));
+    }
     public abstract Element rotate(double degrees);
     public abstract Element scale(double scalar);
     public String toHPGL() {
