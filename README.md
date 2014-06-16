@@ -34,11 +34,10 @@ possible to do something a bit more ambitious.
 Java and Jython
 --
 
-Download a reasonably recent
-[Jython installer jar file](http://sourceforge.net/projects/jython/files/jython/2.5.2/jython_installer-2.5.2.jar/download)
-and run the installer. It's convenient to just put the installation in
-a subdirectory of your home directory (e.g. /Users/you/jython2.5.2 or
-/home/you/jython2.5.2) and then copy the jython.jar file into the lib/ directory.
+Download a reasonably recent [Jython installer jar
+file](http://sourceforge.net/projects/jython/files/jython/2.5.2/jython_installer-2.5.2.jar/download)
+and run the installer. It's convenient to follow the default and put the
+installation in a subdirectory of your home directory.
 
 Make sure you have [a Java JDK](http://en.wikipedia.org/wiki/Java_(programming_language))
 and [Maven](http://maven.apache.org/) installed, and type
@@ -47,5 +46,5 @@ mvn clean package
 ```
 to build the Java code into a jar file. To run the script, type
 ```bash
-java -jar lib/jython.jar mygears.py [args...]
+java -jar $HOME/jython2.5.2/jython.jar mygears.py [args...]
 ```
