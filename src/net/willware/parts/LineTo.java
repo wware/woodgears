@@ -40,11 +40,17 @@ public class LineTo extends Element {
         return new LineTo((Vector) vec.scale(scalar));
     }
 
+    protected String getPostscriptCommand() {
+        return "lineto";
+    }
+
     @Override
     public String toPostscript() {
         StringBuilder sb = new StringBuilder();
         Formatter formatter = new Formatter(sb, Locale.US);
-        formatter.format("%.2f %.2f lineto\n", POSTSCRIPT_DPI * vec.x, POSTSCRIPT_DPI * vec.y);
+        formatter.format("%.2f %.2f ", POSTSCRIPT_DPI * vec.x, POSTSCRIPT_DPI * vec.y);
+        formatter.format(getPostscriptCommand());
+        formatter.format("\n");
         return sb.toString();
     }
 

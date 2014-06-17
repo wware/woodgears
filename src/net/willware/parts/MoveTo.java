@@ -3,7 +3,7 @@ package net.willware.parts;
 import java.util.Formatter;
 import java.util.Locale;
 
-public class MoveTo extends Element {
+public class MoveTo extends LineTo {
 
     Vector vec;
 
@@ -16,16 +16,8 @@ public class MoveTo extends Element {
     }
 
     @Override
-    public Bbox getBbox() {
-        return vec.getBbox();
-    }
-
-    @Override
-    public String toPostscript() {
-        StringBuilder sb = new StringBuilder();
-        Formatter formatter = new Formatter(sb, Locale.US);
-        formatter.format("%.2f %.2f moveto\n", POSTSCRIPT_DPI * vec.x, POSTSCRIPT_DPI * vec.y);
-        return sb.toString();
+    protected String getPostscriptCommand() {
+        return "moveto";
     }
 
     @Override
