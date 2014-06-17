@@ -35,6 +35,21 @@ public class Part extends Path {
         return paths;
     }
 
+    public Part addGrid() {
+        Bbox bbox = getBbox();
+        Path grid = new ColoredPath().setColor(0, 1, 0);
+        for (int x = (int) bbox.getMinX(); x < (int) bbox.getMaxX() + 1; x++) {
+            grid.add(x, bbox.getMinX(), "moveto");
+            grid.add(x, bbox.getMaxY(), "lineto");
+        }
+        for (int y = (int) bbox.getMinY(); y < (int) bbox.getMaxY() + 1; y++) {
+            grid.add(bbox.getMinX(), y, "moveto");
+            grid.add(bbox.getMaxX(), y, "lineto");
+        }
+        paths.add(0, grid);
+        return this;
+    }
+
     public String getInfo() {
         StringBuilder sb = new StringBuilder();
         Formatter formatter = new Formatter(sb, Locale.US);
