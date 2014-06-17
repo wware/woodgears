@@ -54,6 +54,27 @@ class MotorPlate(Part):
         self.addHole(0, -2, 0.195)
 
 
+class CoverPlate(Part):
+	def __init__(self):
+		self.add(Path([
+			MoveTo(-3, -3.5),
+			LineTo(2.5, -3.5),
+			LineTo(2.5, 3.5),
+			LineTo(-3, 3.5),
+			LineTo(-3, 1.5),
+			LineTo(-0.5, 1.5),
+			Arc(0, 1.5, 0.5, 180, 360),
+			LineTo(1, 1.5),
+			LineTo(1, -1.5),
+			Arc(0, -1.5, 0.5, 0, 180),
+			LineTo(-0.5, -1.5),
+			LineTo(-3, -1.5),
+			LineTo(-3, -3.5)
+		]))
+		self.addHole(0, 1.5, 0.250)
+		self.addHole(0, -1.5, 0.250)
+
+
 gear1 = HPGLPart("gear.plt").bottomLeft()
 gear2 = gear1.clone().dropPath(0).add(
     Hexagon.fromSize(7./16).translate(gear1.center()))
@@ -65,13 +86,18 @@ yoffset = gear1.getBbox().getMaxY()
 motorPlate = motorPlate.bottomLeft().translate(Vector(xoffset, 0))
 xoffset2 = motorPlate.getBbox().getMaxX()
 gearPlate = GearPlate().bottomLeft().translate(Vector(xoffset2, 0))
+motorPlate = motorPlate.translate(Vector(0, 1))
+gearPlate = gearPlate.translate(Vector(-1.5, 0))
+xoffset3 = gearPlate.getBbox().getMaxX()
+coverPlate = CoverPlate().bottomLeft().translate(Vector(xoffset3, 0))
 
 everything = Part()
 everything.add(gear1)
 everything.add(gear2.translate(Vector(0, yoffset)))
 everything.add(gear2.translate(Vector(0, 2 * yoffset)))
-everything.add(motorPlate.translate(Vector(0, 1)))
-everything.add(gearPlate.translate(Vector(-1.5, 0)))
+everything.add(motorPlate)
+everything.add(gearPlate)
+everything.add(coverPlate)
 
 if 'small' in sys.argv[1:]:
     everything = everything.scale(0.5)
