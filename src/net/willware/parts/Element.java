@@ -37,6 +37,14 @@ public abstract class Element {
         return (bbox == null) ? null : centerFromBbox();
     }
 
+    public boolean isInformational() {
+        return false;
+    }
+
+    public boolean isDrawable() {
+        return false;
+    }
+
     protected Element _add(Element e) {
         getSubElements().add(e);
         growBbox(e);

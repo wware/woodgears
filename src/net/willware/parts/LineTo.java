@@ -15,6 +15,14 @@ public class LineTo extends Element {
         this.vec = new Vector(x, y);
     }
 
+    public double getX() {
+        return vec.getX();
+    }
+
+    public double getY() {
+        return vec.getY();
+    }
+
     @Override
     public Bbox getBbox() {
         return vec.getBbox();

@@ -5,14 +5,12 @@ import java.util.Locale;
 
 public class MoveTo extends LineTo {
 
-    Vector vec;
-
     public MoveTo(Vector v) {
-        this.vec = v;
+        super(v);
     }
 
     public MoveTo(double x, double y) {
-        this.vec = new Vector(x, y);
+        super(x, y);
     }
 
     @Override

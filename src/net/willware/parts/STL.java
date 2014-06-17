@@ -1,5 +1,6 @@
 package net.willware.parts;
 
+import java.util.Locale;
 import java.util.Formatter;
 import java.util.ArrayList;
 
@@ -15,7 +16,7 @@ class STL {
         this.name = name;
     }
 
-    public toString() {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("solid ");
         sb.append(name);
@@ -27,14 +28,14 @@ class STL {
         return sb.toString();
     }
 
-    class Vector3() {
+    class Vector3 {
         protected double x, y, z;
-        pulic Vector3(double x, double y, double z) {
+        public Vector3(double x, double y, double z) {
             this.x = x;
             this.y = y;
             this.z = z;
         }
-        public toString() {
+        public String toString() {
             StringBuilder sb = new StringBuilder();
             Formatter formatter = new Formatter(sb, Locale.US);
             formatter.format("%.2f %.2f %.2f",
@@ -43,19 +44,19 @@ class STL {
         }
     }
 
-    class Vertex extends Vector3() {
+    class Vertex extends Vector3 {
         public Vertex(double x, double y, double z) {
+            super(x, y, z);
             if (x < 0.0 || y < 0.0 || z < 0.0) {
                 throw new RuntimeException("all coordinates of a Vertex must be non-negative");
             }
-            super(x, y, z);
         }
-        public toString() {
+        public String toString() {
             return "      vertex " + super.toString() + "\n";
         }
     }
 
-    class Facet() {
+    class Facet {
         Vertex v1, v2, v3;
         Vector3 normal;
         public Facet(Vertex v1, Vertex v2, Vertex v3, Vector3 normal) {
@@ -64,7 +65,7 @@ class STL {
             this.v3 = v3;
             this.normal = normal;
         }
-        public toString() {
+        public String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append("  facet normal ");
             sb.append(normal);
@@ -79,7 +80,7 @@ class STL {
         }
     }
 
-    public extrude(Element current, double height) {
+    public STL extrude(Element current, double height) {
         LineTo prev, curr;
         if (current instanceof MoveTo) {
             previous = current;
@@ -107,5 +108,6 @@ class STL {
         else {
             throw new RuntimeException("cannot extrude " + current);
         }
+        return this;
     }
 }

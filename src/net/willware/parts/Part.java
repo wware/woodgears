@@ -8,17 +8,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Formatter;
 
 public class Part extends Path {
 
     ArrayList<Element> paths = new ArrayList<Element>();
-
-    public Element add(Element e) {
-        if (!(e instanceof Path)) {
-            throw new RuntimeException("Elements of a Part must be instances of Path");
-        }
-        return _add(e);
-    }
 
     public Part bottomLeft() {
         Bbox b = getBbox();
@@ -38,6 +33,21 @@ public class Part extends Path {
     @Override
     public ArrayList<Element> getSubElements() {
         return paths;
+    }
+
+    public String getInfo() {
+        StringBuilder sb = new StringBuilder();
+        Formatter formatter = new Formatter(sb, Locale.US);
+        for (Element e : getSubElements()) {
+            if (e.isInformational()) {
+                formatter.format(e.toString());
+                formatter.format("\n");
+            }
+            else if (e instanceof Part) {
+                formatter.format(((Part) e).getInfo());
+            }
+        }
+        return sb.toString();
     }
 
     private static String getStackTrace(final Throwable throwable) {
@@ -87,7 +97,9 @@ public class Part extends Path {
     public String toPostscript() {
         StringBuilder sb = new StringBuilder();
         for (Element e : paths) {
-            sb.append(e.toPostscript());
+            if (e.isDrawable()) {
+                sb.append(e.toPostscript());
+            }
         }
         return sb.toString();
     }

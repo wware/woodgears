@@ -17,13 +17,6 @@ public class Path extends Element {
         return this;
     }
 
-    public Element add(Element e) {
-        if (e instanceof Path) {
-            throw new RuntimeException("Do not add a Path to another Path");
-        }
-        return _add(e);
-    }
-
     public Path() {
     }
 
@@ -31,6 +24,14 @@ public class Path extends Element {
         for (Element pe : lst) {
             add(pe);
         }
+    }
+
+    public boolean isDrawable() {
+        return true;
+    }
+
+    public Element add(Element e) {
+        return _add(e);
     }
 
     public int size() {

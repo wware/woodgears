@@ -102,6 +102,8 @@ everything.add(coverPlate)
 if 'small' in sys.argv[1:]:
     everything = everything.scale(0.5)
 
+# print everything.getInfo()
+
 print "%!PS"
 print everything.toPostscript()
 print "showpage"

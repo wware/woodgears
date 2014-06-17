@@ -19,3 +19,4 @@ class StepperNEMA23(Part):
         self.addHole(0.262, 2.118, 0.195)
         self.addHole(2.118, 0.262, 0.195)
         self.addHole(2.118, 2.118, 0.195)
+        self.add(NamedPoint("Motor axle", 1.190, 1.190));
