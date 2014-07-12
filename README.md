@@ -48,3 +48,62 @@ to build the Java code into a jar file. To run the script, type
 ```bash
 java -jar $HOME/jython2.5.2/jython.jar mygears.py [args...]
 ```
+
+Java? Jython??? the hell was I thinking?
+--
+
+Let's try to borrow from what we learned working on
+[geom3d.py](https://github.com/wware/proj-driver/blob/master/geom3d.py) in the
+[proj-driver](https://github.com/wware/proj-driver) project. And if possible, unify these two projects.
+
+For starters, `geom3d.py` has lovely classes for Vector and BBox, which could accomodate 2D geometry with
+no trouble at all.
+
+Actually let's just think about what we really need, rather than blindly reproducing everything here.
+
+After some thought, I think unification is eminently practical. You can use OpenSCAD from the
+[command line](http://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment)
+to generate an STL file, and I think a little bit of work can get everything up and running
+that way. Rewrite the code that runs underneath `mygears.py`, and make it generate extruded polygons in
+[OpenSCAD](http://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Using_the_2D_Subsystem).
+
+Generate Postscript?
+--
+
+*Postscript generation is no longer needed, see below.*
+
+We need something that takes a bunch of 2D shapes in a
+plane and produces Postscript. The code in `proj-driver` takes a STL file, which is a bunch of triangle is 3D
+space, and computing their intersections with a line in the x-direction.
+
+Let's start to envision another sort of slice operation to generate Postscript. As a plane cuts through a
+bunch of triangles, you get a bunch of line segments. You could be stupid and just do `moveto lineto` for each
+of them, but really you want to try to join them to form paths.
+
+In a given Z plane, you compute all those line segments in an XY plane, and then
+you partition the plane with a big square grid. Every (x,y) point goes in one square of the grid. You avoid
+floating-point ambiguity by using `xmin - epsilon <= x < xmax - epsilon` as the membership criterion, where
+epsilon is tiny.
+
+Now you pick a line segment as random, and you try to grow it at both ends by finding other line segments that
+connect to it, which is efficient because the partitioning has you looking at only a teeny number of candidates
+each time. When you have a path, you remove those line segments from the line segment list and add that path
+to a path list. You keep going until the line segment list is empty. Now you render all those paths in Postscript.
+
+Maybe generate DXF instead of Postscript?
+--
+
+[Danger!awesome](http://dangerawesome.co/our-technology/)'s website says:
+
+> We prefer .eps, .pdf, and .dxf files, though if needed we can work from a range of raster-based
+> file formats for etching/engraving and vector-based file formats for etching/engraving and cutting.
+
+OpenSCAD can
+[generate DXF](http://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Using_the_2D_Subsystem#3D_to_2D_Projection)
+from a slice of a 3D model.
+
+Importing HPGL from Gear Generator
+--
+
+There is a 2D subsystem in OpenSCAD. Convert the HPGL to primitives. All I need to do is take the output of
+Gear Generator and convert it to an OpenSCAD polygon, and extrude it to produce a 3D gear.
