@@ -7,3 +7,4 @@ target/
 *.pdf
 *.pyc
 *.class
+gear1*.scad
