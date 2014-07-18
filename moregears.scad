@@ -13,30 +13,45 @@ So do this instead.
 
 use <gear10.scad>;
 use <gear100.scad>;
-use <gear120.scad>;
+// use <gear120.scad>;
 
 module StepperGear() {
-    scale([1,1,0.25]) {
-        difference() {
-            union() {
-                translate([0,0,-0.5])
-                        cylinder(h=1, r=0.2);
-                Gear10();
-            }
-            translate([0,0,-0.5]) {
-                intersection() {
-                    cylinder(h=1, r=0.125, $fs=0.01);
-                    translate([-0.125, -0.125, 0]) {
-                        cube([0.228, 0.25, 1]);
-                    }
+    difference() {
+        union() {
+            translate([0,0,-0.125])
+                    cylinder(h=0.25, r=0.2, $fn=8);
+            Gear10();
+        }
+        translate([0,0,-0.13]) {
+            intersection() {
+                cylinder(h=0.35, r=0.125, $fn=40);
+                translate([-0.125, -0.125, 0]) {
+                    cube([0.228, 0.25, 0.35]);
                 }
             }
         }
     }
 }
 
-// StepperGear();
-// translate([3,0,0]) scale([1,1,0.25]) Gear10();
+module HexNutGear() {
+    difference() {
+        Gear10();
+        intersection_for(n = [1 : 3]) {
+            rotate([0, 0, n * 60]) {
+                translate([-0.21875,-0.5,-0.5])
+                    cube([0.4375,1,1]);
+            }
+        }
+    }
+}
+
+projection(cut = true) {
+    import("annular_gear.stl");
+	StepperGear();
+	translate([1.2, 0, 0]) HexNutGear();
+	translate([0, 1.2, 0]) HexNutGear();
+	translate([1.2, 1.2, 0]) HexNutGear();
+}
 
 module TorusGear() {
     difference() {
@@ -45,4 +60,4 @@ module TorusGear() {
     }
 }
 
-TorusGear();
+// TorusGear();
