@@ -78,34 +78,34 @@ class MotorPlate(Part):
 
 
 class CoverPlate(Part):
-	def __init__(self):
-		self.add(Path([
-			MoveTo(0, 7),
-			LineTo(0, 6),
-			LineTo(0.5, 6),
-			LineTo(1.5, 5),
-			Arc(2, 5, 0.5, 180, 360),
-			LineTo(2.5, 5),
-			LineTo(4, 5),
-			LineTo(4, 2),
-			LineTo(2.5, 2),
-			Arc(2, 2, 0.5, 0, 180),
-			LineTo(1.5, 2),
-			LineTo(0.5, 1),
-			LineTo(0, 1),
-			LineTo(0, 0),
-			LineTo(1, 0),
-			LineTo(1, 0.5),
-			LineTo(2, 1.5),
-			LineTo(4.5, 1.5),
-			LineTo(4.5, 5.5),
-			LineTo(2, 5.5),
-			LineTo(1, 6.5),
-			LineTo(1, 7),
-			LineTo(0, 7)
-		]))
-		self.addHole(2, 2, 0.250)
-		self.addHole(2, 5, 0.250)
+    def __init__(self):
+        self.add(Path([
+            MoveTo(0, 7),
+            LineTo(0, 6),
+            LineTo(0.5, 6),
+            LineTo(1.5, 5),
+            Arc(2, 5, 0.5, 180, 360),
+            LineTo(2.5, 5),
+            LineTo(4, 5),
+            LineTo(4, 2),
+            LineTo(2.5, 2),
+            Arc(2, 2, 0.5, 0, 180),
+            LineTo(1.5, 2),
+            LineTo(0.5, 1),
+            LineTo(0, 1),
+            LineTo(0, 0),
+            LineTo(1, 0),
+            LineTo(1, 0.5),
+            LineTo(2, 1.5),
+            LineTo(4.5, 1.5),
+            LineTo(4.5, 5.5),
+            LineTo(2, 5.5),
+            LineTo(1, 6.5),
+            LineTo(1, 7),
+            LineTo(0, 7)
+        ]))
+        self.addHole(2, 2, 0.250)
+        self.addHole(2, 5, 0.250)
 
 
 gear1 = HPGLPart("gear.plt").bottomLeft()
@@ -141,18 +141,18 @@ everything.add(support2)
 everything.add(support3)
 
 if 'only' in sys.argv[1:]:
-	everything = Part()
-	everything.add(gearPlate.bottomLeft().translate(1, 1))
+    everything = Part()
+    everything.add(gearPlate.bottomLeft().translate(1, 1))
 
 if 'grid' in sys.argv[1:]:
-	everything.addGrid()
+    everything.addGrid()
 
 if 'small' in sys.argv[1:]:
     everything = everything.scale(0.5).translate(1, 1)
 
 if 'info' in sys.argv[1:]:
-	print everything.getInfo()
-	raise SystemExit
+    print everything.getInfo()
+    raise SystemExit
 
 print "%!PS"
 print everything.toPostscript()

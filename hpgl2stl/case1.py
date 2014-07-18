@@ -1,8 +1,5 @@
-# Write code to handle the convex polygon with no holes, and write tests for it.
-
 import sys
-from math import pi, sin, cos
-from pprint import pprint
+
 
 class Vertex:
 
@@ -78,6 +75,7 @@ def interior_to(edges):
     True
     """
     edges = edges[:]
+
     def func(pt, edges=edges):
         intersections = 0
         for edge in edges:
@@ -145,7 +143,8 @@ def single_collision(edge1, edge2, h=1.0e-10):
     # compute product of cross products
     xp0, xp1, xp2, xp3 = t.cross(u), u.cross(v), v.cross(w), w.cross(t)
     return ((xp0 > h and xp1 > h and xp2 > h and xp3 > h) or
-        (xp0 < -h and xp1 < -h and xp2 < -h and xp3 < -h))
+            (xp0 < -h and xp1 < -h and xp2 < -h and xp3 < -h))
+
 
 def collision_detector(edges):
     def func(edge, edges=edges):
@@ -154,6 +153,7 @@ def collision_detector(edges):
 
 # A simple polygon (or path) is a list of vertices. It is assumed to be closed,
 # so the first and last won't be the same point.
+
 
 def simple_triangulate(polygon, mesh=None):
     """
@@ -173,7 +173,8 @@ def simple_triangulate(polygon, mesh=None):
     >>> len(mesh)
     8
     >>> mesh
-    [(B, C, D), (D, E, F), (D, F, G), (D, G, H), (D, H, I), (I, J, A), (I, A, B), (I, B, D)]
+    [(B, C, D), (D, E, F), (D, F, G), (D, G, H), (D, H, I), \
+(I, J, A), (I, A, B), (I, B, D)]
     >>> polygon = [
     ...   Vertex('A', 1, 0),
     ...   Vertex('B', 2, 0),
@@ -193,7 +194,8 @@ def simple_triangulate(polygon, mesh=None):
     >>> len(mesh)
     11
     >>> mesh
-    [(A, B, C), (C, D, E), (E, F, G), (E, G, H), (E, H, I), (K, L, M), (K, M, A), (K, A, C), (C, E, I), (C, I, J), (C, J, K)]
+    [(A, B, C), (C, D, E), (E, F, G), (E, G, H), (E, H, I), (K, L, M), \
+(K, M, A), (K, A, C), (C, E, I), (C, I, J), (C, J, K)]
     """
     edges = [(u, v) for u, v in zip(polygon, polygon[1:] + polygon[:1])]
     edge_collisions = collision_detector(edges)
@@ -201,9 +203,10 @@ def simple_triangulate(polygon, mesh=None):
     if mesh is None:
         mesh = []
     """
-    The strategy is to find three consecutive points along the path that can be used
-    to form a triangle that is interior to the shape, so its third side doesn't
-    collide with any other edges and doesn't have any vertices in it.
+    The strategy is to find three consecutive points along the path
+    that can be used to form a triangle that is interior to the shape,
+    so its third side doesn't collide with any other edges and doesn't
+    have any vertices in it.
     """
 
     def centroid(polygon):
@@ -218,8 +221,7 @@ def simple_triangulate(polygon, mesh=None):
                 centroid=centroid, edge_collisions=edge_collisions):
         if not interior(centroid(triangle)):
             return False
-        # TODO make sure no vertices are internal to this triangle, besides those
-        # that are vertices of the triangle itself
+        # TODO make sure no vertices are internal to this triangle
         return not edge_collisions((triangle[0], triangle[2]))
 
     countdown = len(polygon) + 2
@@ -229,12 +231,12 @@ def simple_triangulate(polygon, mesh=None):
             return mesh
         triangle = tuple(polygon[:3])
         if not is_good(triangle):
-            print >> sys.stderr, triangle, 'bad'
+            # print >> sys.stderr, triangle, 'bad'
             countdown -= 1
             assert countdown > 0, polygon
             polygon = polygon[1:] + polygon[:1]
         else:
-            print >> sys.stderr, triangle, 'good'
+            # print >> sys.stderr, triangle, 'good'
             mesh.append(triangle)
             polygon = polygon[:1] + polygon[2:]
             countdown = len(polygon) + 2

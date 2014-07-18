@@ -1,27 +1,13 @@
-from case1 import *
+from case1 import simple_triangulate
 
 """
-A polygon with a hole is made up of multiple non-overlapping closed paths, one
-surrounding the others. Exactly one path is the outermost path, the periphery of
-the object, and we can identify it because any ray originating anywhere inside it
-(whether in a hole or in the interior) that goes out to infinity must cross the
-outermost path last.
-
-Now we take any other path and try to create a line segment that connects that
-inner path with the outermost path without crossing any of the other paths. If
-we succeed at that, we can treat say that topologically we have eliminated one
-hole, as the inner path has now become part of the periphery - this will require
-rewriting the orders of the paths, but is doable.
-
-We keep chipping away, removing holes one by one, until no holes are left, and
-then we can simply apply case 2.
-
-There won't be a lot of these line segments (only one per hole) and they could
-be set up manually. There would need to be some kind of UI to make that easy.
+WORK IN PROGRESS
 """
+
 
 def complex_triangulate(polygon, hints=None):
     """
+    >>> from case1 import Vertex
     >>> polygon = [
     ...   [
     ...     Vertex('A', 0, 0),
@@ -42,7 +28,12 @@ def complex_triangulate(polygon, hints=None):
     ...     Vertex('N', 2, 2),
     ...   ]
     ... ]
-    >>> # mesh = complex_triangulate(polygon, hints=[polygon[0][0], polygon[1][0]])
+    >>> mesh = complex_triangulate(polygon,
+    ...                            hints=[polygon[0][0], polygon[1][0]])
+    >>> len(mesh)
+    14
+    >>> mesh
+    [(A, N, M), (L, K, K), (L, K, A), (L, A, B), (D, E, F), (I, G, H)]
     >>> polygon = [
     ...   Vertex('A', 0, 0),
     ...   Vertex('B', 1, 1),
@@ -65,7 +56,9 @@ def complex_triangulate(polygon, hints=None):
     >>> len(mesh)
     14
     >>> mesh
-    [(A, N, M), (L, K, K), (L, K, A), (L, A, B), (D, E, F), (D, F, G), (I, J, A), (I, A, M), (I, M, M), (I, M, L), (I, L, B), (I, B, D), (I, D, G), (I, G, H)]
+    [(A, N, M), (L, K, K), (L, K, A), (L, A, B), (D, E, F), (D, F, G), \
+        (I, J, A), (I, A, M), (I, M, M), (I, M, L), (I, L, B), \
+        (I, B, D), (I, D, G), (I, G, H)]
     """
     if not hints:
         raise Exception("too dumb to work without hints")
@@ -78,8 +71,7 @@ def complex_triangulate(polygon, hints=None):
     if m == 0:
         p0 = polygon[0] + p1a + p1b
     else:
-        p0 = polygon[0][:m] + p1 + polygon[0][m:]
-    #assert False, p0
+        p0 = polygon[0][:m] + p1a + p1b + polygon[0][m:]
     return simple_triangulate(p0)
 
 if __name__ == "__main__":
